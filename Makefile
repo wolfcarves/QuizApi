@@ -1,4 +1,6 @@
 dev:
 	dotnet watch --project QuizApi.WebApi/QuizApi.WebApi.csproj
-add:
-	dotnet add QuizApi.WebApi package $(package)
+migration:
+	dotnet ef migrations add $(name) --startup-project ./QuizApi.WebApi --project ./QuizApi.Infrastructure
+update-database:
+	dotnet ef database update --startup-project ./QuizApi.WebApi --project ./QuizApi.Infrastructure

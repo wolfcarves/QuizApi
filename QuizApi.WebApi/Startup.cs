@@ -1,7 +1,9 @@
 namespace QuizApi.WebApi;
 
 using System.ComponentModel.Design;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using QuizApi.Infrastructure.Data;
 
 public class Startup
 {
@@ -14,8 +16,9 @@ public class Startup
         services.AddControllers();
         services.AddProblemDetails();
         services.AddExceptionHandler<GlobalExceptionHandler>();
-        services.AddOpenApi();
         services.AddRouting(options => options.LowercaseUrls = true);
+        services.AddInfrastructure(Configuration);
+        services.AddOpenApi();
         services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo

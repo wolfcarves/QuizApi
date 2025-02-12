@@ -2,8 +2,8 @@ public class AuthService
 {
     public AuthService() { }
 
-    public async Task<bool> AuthenticateUser()
+    public string AuthenticateUser()
     {
-
+        return "";
     }
 }
