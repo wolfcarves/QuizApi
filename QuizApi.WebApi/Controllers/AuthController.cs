@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using QuizApi.Core.Exceptions;
+using QuizApi.WebApi.Attributes;
 
 
 [ApiController]
@@ -8,7 +9,8 @@ public class AuthController : ControllerBase
 {
     public AuthController() { }
 
-    [HttpGet("login", Name = "LoginUser", Order = 4)]
+    [HttpPost("login", Name = "LoginUser", Order = 4)]
+    [NotFoundResponse]
     public IActionResult Login()
     {
         throw new NotFoundException("");
