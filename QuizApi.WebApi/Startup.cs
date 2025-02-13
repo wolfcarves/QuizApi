@@ -24,10 +24,10 @@ public class Startup
         services.AddRouting(options => options.LowercaseUrls = true);
         services.AddCustomSwaggerGen();
         services.AddOpenApi();
-        services.AddCustomAppDbContext(Configuration);
         services.AddApplicationService();
         services.AddJwtService();
         services.AddRepositoriesScope();
+        services.AddCustomAppDbContext(Configuration);
 
         var tokenParameters = JwtConfiguration.GetTokenValidationParameters();
 

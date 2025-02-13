@@ -1,5 +1,19 @@
-public class SuccessResponse
+public class SuccessResponse<T>
 {
-    public int statusCode { get; set; }
-    public string message { get; set; }
+    public bool Success { get; set; }
+    public T? Data { get; set; }
+    public string? Message { get; set; }
+
+    public SuccessResponse(T data, string message = "")
+    {
+        Success = true;
+        Data = data;
+        Message = message;
+    }
+
+    public SuccessResponse(string message = "")
+    {
+        Success = true;
+        Message = message;
+    }
 }

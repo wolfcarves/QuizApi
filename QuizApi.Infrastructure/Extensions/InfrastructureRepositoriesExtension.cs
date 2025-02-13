@@ -4,10 +4,11 @@ using QuizApi.Infrastructure.Repositories;
 
 namespace QuizApi.Infrastructure.Extensions;
 
-public static class RepositoriesServiceExtension
+public static class InfrastructureRepositoriesExtension
 {
     public static IServiceCollection AddRepositoriesScope(this IServiceCollection services)
     {
-        return services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();
+        return services;
     }
 }

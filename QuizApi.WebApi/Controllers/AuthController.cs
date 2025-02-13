@@ -1,18 +1,15 @@
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc;
 using QuizApi.Application.DTO.User;
-using QuizApi.Application.Services;
-using QuizApi.Core.Exceptions;
-using QuizApi.Infrastructure.Authentication;
+using QuizApi.Application.Interfaces.Services;
 
 [ApiController]
 [Route("api/v1/[controller]")]
 public class AuthController : ControllerBase
 {
-    private readonly AuthService _authService;
-    private readonly JwtTokenService _jwtService;
-    public AuthController(AuthService authService, JwtTokenService jwtService)
+    private readonly IAuthService _authService;
+    private readonly IJwtTokenService _jwtService;
+
+    public AuthController(IAuthService authService, IJwtTokenService jwtService)
     {
         _authService = authService;
         _jwtService = jwtService;
@@ -21,25 +18,24 @@ public class AuthController : ControllerBase
     [HttpPost("login", Name = "LoginUser")]
     public async Task<IActionResult> Login([FromBody] UserLoginDTO requestBody)
     {
-        var jwt = new JwtTokenService();
-
         string username = requestBody.Username;
         string password = requestBody.Password;
 
-        var user = await _authService.LoginUserAsync(username, password);
+        // var user = await _authService.LoginUserAsync(username, password);
 
-        return Ok(jwt.GenerateAccessToken($"{user.Id}", user.Username, "user"));
+        return Ok("user");
+
+        // return Ok(jwt.GenerateAccessToken($"{user.Id}", user.Username, "user"));
     }
 
     [HttpGet]
-    public string ValidateTokenKey(string token)
+    public ActionResult<string> ValidateTokenKey(string token)
     {
-        var result = JsonSerializer.Serialize(_jwtService.ValidateToken(token), new JsonSerializerOptions
-        {
-            WriteIndented = true,
-            ReferenceHandler = ReferenceHandler.IgnoreCycles,
-        });
-
-        return result;
+        // var result = JsonSerializer.Serialize(_jwtService.ValidateToken(token), new JsonSerializerOptions
+        // {
+        //     WriteIndented = true,
+        //     ReferenceHandler = ReferenceHandler.IgnoreCycles,
+        // });
+        return Ok(new SuccessResponse<object>("awd"));
     }
 }

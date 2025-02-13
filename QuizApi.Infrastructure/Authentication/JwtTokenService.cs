@@ -2,10 +2,11 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
+using QuizApi.Application.Interfaces.Services;
 
 namespace QuizApi.Infrastructure.Authentication;
 
-public class JwtTokenService
+public class JwtTokenService : IJwtTokenService
 {
     public string GenerateAccessToken(string userId, string username, string role)
     {
