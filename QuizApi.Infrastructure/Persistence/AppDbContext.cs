@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using QuizApi.Core.Entities;
 
-namespace QuizApi.Infrastructure.Data;
+namespace QuizApi.Infrastructure.Persistence;
 
 public class AppDbContext : DbContext
 {
@@ -9,6 +9,7 @@ public class AppDbContext : DbContext
 
     public DbSet<Admin> Admins { get; set; }
     public DbSet<Quiz> Quizzes { get; set; }
+    public DbSet<User> Users { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

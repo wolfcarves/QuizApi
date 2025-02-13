@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using QuizApi.WebApi.Models;
+using QuizApi.WebApi.Common;
 
 namespace QuizApi.WebApi.Attributes;
 

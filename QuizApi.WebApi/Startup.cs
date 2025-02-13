@@ -1,15 +1,20 @@
 namespace QuizApi.WebApi;
 
-using System.ComponentModel.Design;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
-using QuizApi.Infrastructure.Data;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using QuizApi.Infrastructure.Configuration;
+using DotNetEnv;
+using QuizApi.Infrastructure.Extensions;
+using QuizApi.Application.Extensions;
 
 public class Startup
 {
     public IConfiguration Configuration;
 
-    public Startup(IConfiguration configuration) => Configuration = configuration;
+    public Startup(IConfiguration configuration)
+    {
+        Env.Load();
+        Configuration = configuration;
+    }
 
     public void ConfigureServices(IServiceCollection services)
     {
@@ -17,18 +22,17 @@ public class Startup
         services.AddProblemDetails();
         services.AddExceptionHandler<GlobalExceptionHandler>();
         services.AddRouting(options => options.LowercaseUrls = true);
-        services.AddInfrastructure(Configuration);
+        services.AddCustomSwaggerGen();
         services.AddOpenApi();
-        services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo
-                {
-                    Title = "QuizApi",
-                    Version = "v1",
-                    Description = "QuizApi ni Rodel Malupet, powered by ChatGPT 4 mini",
-                });
-            }
-        );
+        services.AddCustomAppDbContext(Configuration);
+        services.AddApplicationService();
+        services.AddJwtService();
+        services.AddRepositoriesScope();
+
+        var tokenParameters = JwtConfiguration.GetTokenValidationParameters();
+
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options => options.TokenValidationParameters = tokenParameters);
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -37,7 +41,6 @@ public class Startup
         {
             app.UseSwagger();
             app.UseSwaggerUI();
-
             app.UseExceptionHandler();
         }
         else
