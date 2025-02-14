@@ -1,5 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using QuizApi.Application.Interfaces.Services;
@@ -36,32 +37,39 @@ public class JwtTokenService : IJwtTokenService
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-    public ClaimsPrincipal? ValidateToken(string token)
+    public string GenerateRefreshToken()
+    {
+        var randomText = RandomNumberGenerator.GetBytes(64);
+        return Convert.ToBase64String(randomText);
+    }
+
+    public bool ValidateToken(string token)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Environment.GetEnvironmentVariable("JWT_SECRET") ?? throw new InvalidOperationException("JWT_SECRET is not set");
         var jwtIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER");
         var jwtAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE");
 
+        TokenValidationParameters tokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
+            ValidateIssuer = true,
+            ValidIssuer = jwtIssuer,
+            ValidateAudience = true,
+            ValidAudience = jwtAudience,
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero
+        };
+
         try
         {
-            var principal = tokenHandler.ValidateToken(token, new TokenValidationParameters
-            {
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
-                ValidateIssuer = true,
-                ValidIssuer = jwtIssuer,
-                ValidateAudience = true,
-                ValidAudience = jwtAudience,
-                ValidateLifetime = true,
-                ClockSkew = TimeSpan.Zero
-            }, out _);
-
-            return principal;
+            tokenHandler.ValidateToken(token, tokenValidationParameters, out _);
+            return true;
         }
         catch
         {
-            return null;
+            return false;
         }
     }
 }

@@ -5,6 +5,8 @@ using QuizApi.Infrastructure.Configuration;
 using DotNetEnv;
 using QuizApi.Infrastructure.Extensions;
 using QuizApi.Application.Extensions;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 public class Startup
 {
@@ -18,7 +20,12 @@ public class Startup
 
     public void ConfigureServices(IServiceCollection services)
     {
-        services.AddControllers();
+        services.AddControllers()
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                    options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.Never;
+                });
         services.AddProblemDetails();
         services.AddExceptionHandler<GlobalExceptionHandler>();
         services.AddRouting(options => options.LowercaseUrls = true);
@@ -28,11 +35,12 @@ public class Startup
         services.AddJwtService();
         services.AddRepositoriesScope();
         services.AddCustomAppDbContext(Configuration);
+        services.AddAutoMapper(typeof(UserProfile));
 
         var tokenParameters = JwtConfiguration.GetTokenValidationParameters();
 
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options => options.TokenValidationParameters = tokenParameters);
+                    .AddJwtBearer(options => options.TokenValidationParameters = tokenParameters);
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

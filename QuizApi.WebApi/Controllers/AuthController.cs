@@ -1,9 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using QuizApi.Application.DTO.User;
 using QuizApi.Application.Interfaces.Services;
+using QuizApi.WebApi.Attributes;
 
 [ApiController]
 [Route("api/v1/[controller]")]
+[OkRTA]
+[ServerInternalRTA]
 public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
@@ -16,16 +19,25 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("login", Name = "LoginUser")]
+    [UnauthorizedRTA]
     public async Task<IActionResult> Login([FromBody] UserLoginDTO requestBody)
     {
-        string username = requestBody.Username;
-        string password = requestBody.Password;
+        var user = await _authService.LoginUserAsync(requestBody);
+        // var accessToken = _jwtService.GenerateAccessToken($"{user.Id}", user.Username, "user");
 
-        // var user = await _authService.LoginUserAsync(username, password);
+        var accessToken = _jwtService.GenerateAccessToken("1", "cazcade", "user");
+        var refreshToken = _jwtService.GenerateRefreshToken();
 
-        return Ok("user");
+        return Ok(new SuccessResponse<string>("My Message is here!"));
+    }
 
-        // return Ok(jwt.GenerateAccessToken($"{user.Id}", user.Username, "user"));
+    [HttpPost("signup", Name = "SignupUser")]
+    [BadRequestRTA]
+    [ConflictRTA]
+    public async Task<ActionResult<UserDTO>> Signup([FromBody] UserSignUpDTO requestBody)
+    {
+        var user = await _authService.SignUpAsync(requestBody);
+        return Ok(user);
     }
 
     [HttpGet]

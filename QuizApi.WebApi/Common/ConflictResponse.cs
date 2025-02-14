@@ -1,6 +1,6 @@
 namespace QuizApi.WebApi.Common;
 
-public class ErrorResponse
+public class ConflictResponse
 {
     public int StatusCode { get; set; }
     public string Message { get; set; } = string.Empty;
