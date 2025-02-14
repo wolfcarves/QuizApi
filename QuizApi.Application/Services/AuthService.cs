@@ -3,7 +3,7 @@ using FluentValidation;
 using QuizApi.Application.DTO.User;
 using QuizApi.Application.Interfaces.Repositories;
 using QuizApi.Application.Interfaces.Services;
-using QuizApi.Application.Validations.User;
+using QuizApi.Application.Validators.User;
 using QuizApi.Core.Entities;
 using QuizApi.Core.Exceptions;
 
@@ -33,7 +33,7 @@ public class AuthService : IAuthService
 
     public async Task<UserDTO> SignUpAsync(UserSignUpDTO requestBody)
     {
-        UserSignupValidation validator = new UserSignupValidation();
+        UserSignupValidator validator = new UserSignupValidator();
         await validator.ValidateAndThrowAsync(requestBody);
 
         string username = requestBody.Username;

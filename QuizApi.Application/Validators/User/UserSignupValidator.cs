@@ -1,12 +1,11 @@
 using FluentValidation;
-using FluentValidation.Results;
 using QuizApi.Application.DTO.User;
 
-namespace QuizApi.Application.Validations.User;
+namespace QuizApi.Application.Validators.User;
 
-public class UserSignupValidation : AbstractValidator<UserSignUpDTO>
+public class UserSignupValidator : AbstractValidator<UserSignUpDTO>
 {
-    public UserSignupValidation()
+    public UserSignupValidator()
     {
         RuleFor(user => user.Firstname)
             .NotEmpty().WithMessage("First name is required.")

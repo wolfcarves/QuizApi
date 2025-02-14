@@ -29,7 +29,6 @@ public class Startup
                     options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.Never;
                 });
         services.AddFluentValidationAutoValidation();
-        services.AddCustomValidatorsFromAssembly();
         services.AddProblemDetails();
         services.AddExceptionHandler<GlobalExceptionHandler>();
         services.AddRouting(options => options.LowercaseUrls = true);
