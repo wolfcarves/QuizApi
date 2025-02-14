@@ -7,6 +7,8 @@ using QuizApi.Infrastructure.Extensions;
 using QuizApi.Application.Extensions;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Mvc;
 
 public class Startup
 {
@@ -26,6 +28,8 @@ public class Startup
                     options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
                     options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.Never;
                 });
+        services.AddFluentValidationAutoValidation();
+        services.AddCustomValidatorsFromAssembly();
         services.AddProblemDetails();
         services.AddExceptionHandler<GlobalExceptionHandler>();
         services.AddRouting(options => options.LowercaseUrls = true);

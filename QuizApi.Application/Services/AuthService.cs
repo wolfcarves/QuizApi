@@ -1,8 +1,9 @@
 using AutoMapper;
-using BCrypt.Net;
+using FluentValidation;
 using QuizApi.Application.DTO.User;
 using QuizApi.Application.Interfaces.Repositories;
 using QuizApi.Application.Interfaces.Services;
+using QuizApi.Application.Validations.User;
 using QuizApi.Core.Entities;
 using QuizApi.Core.Exceptions;
 
@@ -32,11 +33,11 @@ public class AuthService : IAuthService
 
     public async Task<UserDTO> SignUpAsync(UserSignUpDTO requestBody)
     {
+        UserSignupValidation validator = new UserSignupValidation();
+        await validator.ValidateAndThrowAsync(requestBody);
+
         string username = requestBody.Username;
         string password = requestBody.Password;
-        string confirmPassword = requestBody.ConfirmPassword;
-
-        if (password != confirmPassword) throw new BadRequestException("Password didn't matched.");
 
         var existingUser = await _userRepository.FindOneByUsername(username);
         if (existingUser != null) throw new ConflictException("Username already taken.");

@@ -1,4 +1,3 @@
-using QuizApi.Application.DTO.User;
 using QuizApi.Core.Entities;
 
 namespace QuizApi.Application.Interfaces.Repositories;
