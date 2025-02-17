@@ -8,7 +8,6 @@ using QuizApi.Application.Extensions;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using FluentValidation.AspNetCore;
-using Microsoft.AspNetCore.Mvc;
 
 public class Startup
 {
@@ -52,17 +51,17 @@ public class Startup
         {
             app.UseSwagger();
             app.UseSwaggerUI();
-            app.UseExceptionHandler();
-        }
-        else
-        {
-            app.UseExceptionHandler(opt => { });
-            app.UseHsts();
         }
 
+        app.UseExceptionHandler();
+
+        app.UseHsts();
         app.UseHttpsRedirection();
         app.UseRouting();
+
+        app.UseAuthentication();
         app.UseAuthorization();
+
         app.UseEndpoints(
             endpoints => endpoints.MapControllers()
         );

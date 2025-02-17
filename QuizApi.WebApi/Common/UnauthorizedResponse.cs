@@ -1,7 +1,10 @@
+using System.ComponentModel;
+
 namespace QuizApi.WebApi.Common;
 
 public class UnauthorizedResponse
 {
-    public int StatusCode { get; set; }
+    [DefaultValue(401)]
+    public int Status { get; set; }
     public string Message { get; set; } = string.Empty;
 }

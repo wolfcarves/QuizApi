@@ -4,5 +4,6 @@ namespace QuizApi.Application.Interfaces.Services;
 
 public interface IUserService
 {
-    Task<User> GetUserAsync(string username);
+    Task<User> GetUserByIdAsync(int id);
+    Task<User> GetUserByUsernameAsync(string username);
 }

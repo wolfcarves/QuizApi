@@ -1,5 +1,8 @@
+using System.ComponentModel;
+
 public class SuccessResponse<T>
 {
+    [DefaultValue(200)]
     public bool Success { get; set; }
     public T Data { get; set; }
     public string? Message { get; set; }
@@ -8,7 +11,7 @@ public class SuccessResponse<T>
     {
         Success = true;
         Data = data;
-        Message = message; 
+        Message = message;
     }
 
     public SuccessResponse(string message)

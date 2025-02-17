@@ -12,7 +12,7 @@ using QuizApi.Infrastructure.Persistence;
 namespace InitialMigration
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250214053019_InitialMigration")]
+    [Migration("20250217051122_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -25,41 +25,6 @@ namespace InitialMigration
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("QuizApi.Core.Entities.Admin", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime?>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Admins");
-                });
-
             modelBuilder.Entity("QuizApi.Core.Entities.Quiz", b =>
                 {
                     b.Property<int>("Id")
@@ -67,9 +32,6 @@ namespace InitialMigration
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AdminId")
-                        .HasColumnType("int");
 
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -85,9 +47,12 @@ namespace InitialMigration
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("AdminId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("Quizzes");
                 });
@@ -129,16 +94,16 @@ namespace InitialMigration
 
             modelBuilder.Entity("QuizApi.Core.Entities.Quiz", b =>
                 {
-                    b.HasOne("QuizApi.Core.Entities.Admin", "Admin")
+                    b.HasOne("QuizApi.Core.Entities.User", "User")
                         .WithMany("Quizzes")
-                        .HasForeignKey("AdminId")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Admin");
+                    b.Navigation("User");
                 });
 
-            modelBuilder.Entity("QuizApi.Core.Entities.Admin", b =>
+            modelBuilder.Entity("QuizApi.Core.Entities.User", b =>
                 {
                     b.Navigation("Quizzes");
                 });

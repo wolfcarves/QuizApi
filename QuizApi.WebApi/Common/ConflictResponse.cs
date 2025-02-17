@@ -1,7 +1,10 @@
+using System.ComponentModel;
+
 namespace QuizApi.WebApi.Common;
 
 public class ConflictResponse
 {
-    public int StatusCode { get; set; }
+    [DefaultValue(409)]
+    public int Status { get; set; }
     public string Message { get; set; } = string.Empty;
 }

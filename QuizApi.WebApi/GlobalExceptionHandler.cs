@@ -1,6 +1,7 @@
-using System.Text.Json;
 using Microsoft.AspNetCore.Diagnostics;
 using QuizApi.Core.Exceptions;
+using FluentValidation;
+using System.Text.Json;
 
 namespace QuizApi.WebApi;
 
@@ -18,6 +19,7 @@ public class GlobalExceptionHandler : IExceptionHandler
         {
             httpContext.Response.StatusCode = contextFeature.Error switch
             {
+                ValidationException => StatusCodes.Status400BadRequest,
                 BadRequestException => StatusCodes.Status400BadRequest,
                 NotFoundException => StatusCodes.Status404NotFound,
                 ConflictException => StatusCodes.Status409Conflict,
@@ -25,13 +27,29 @@ public class GlobalExceptionHandler : IExceptionHandler
                 _ => StatusCodes.Status500InternalServerError
             };
 
-            var response = new
-            {
-                statusCode = httpContext.Response.StatusCode,
-                message = contextFeature.Error.Message
-            };
+            object response;
 
-            var jsonResponse = JsonSerializer.Serialize(response);
+            if (contextFeature.Error is ValidationException validationException)
+            {
+                response = new
+                {
+                    status = httpContext.Response.StatusCode,
+                    message = "Validation Failed",
+                    errors = validationException.Errors
+                                                .GroupBy(e => e.PropertyName)
+                                                .ToDictionary(g => g.Key, g => g.Select(e => e.ErrorMessage).ToArray())
+                };
+            }
+            else
+            {
+                response = new
+                {
+                    status = httpContext.Response.StatusCode,
+                    message = contextFeature.Error.Message
+                };
+            }
+
+            var jsonResponse = JsonSerializer.Serialize(response, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase, DictionaryKeyPolicy = JsonNamingPolicy.CamelCase });
             await httpContext.Response.WriteAsync(jsonResponse);
         }
 
