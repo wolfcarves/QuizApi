@@ -1,3 +1,4 @@
+using System.IdentityModel.Tokens.Jwt;
 using AutoMapper;
 using FluentValidation;
 using QuizApi.Application.DTO.User;
@@ -12,14 +13,16 @@ namespace QuizApi.Application.Services;
 public class AuthService : IAuthService
 {
     private readonly IUserRepository _userRepository;
+    private readonly IJwtTokenService _jwtService;
     private readonly IMapper _mapper;
-    public AuthService(IUserRepository userRepository, IMapper mapper)
+    public AuthService(IUserRepository userRepository, IJwtTokenService jwtService, IMapper mapper)
     {
         _userRepository = userRepository;
+        _jwtService = jwtService;
         _mapper = mapper;
     }
 
-    public async Task<User> LoginUserAsync(UserLoginDTO requestBody)
+    public async Task<(string accessToken, string refreshToken)> LoginUserAsync(UserLoginDTO requestBody)
     {
         string username = requestBody.Username;
 
@@ -28,7 +31,10 @@ public class AuthService : IAuthService
         if (user == null)
             throw new UnauthorizedException("Username or password is incorrect");
 
-        return user;
+        var accessToken = _jwtService.GenerateAccessToken($"{user.Id}", user.Username, "user");
+        var refreshToken = _jwtService.GenerateRefreshToken();
+
+        return (accessToken, refreshToken);
     }
 
     public async Task<UserDTO> SignUpAsync(UserSignUpDTO requestBody)
@@ -48,6 +54,24 @@ public class AuthService : IAuthService
         user.Password = hashPassword;
 
         await _userRepository.PostUser(user);
+
+        return _mapper.Map<UserDTO>(user);
+    }
+
+    public async Task<UserDTO> GetUserSessionAsync(string? accessToken)
+    {
+        if (accessToken == null) throw new UnauthorizedException("Unauthorized");
+
+        var handler = new JwtSecurityTokenHandler();
+        var jwtToken = handler.ReadJwtToken(accessToken);
+
+        var authorization = accessToken.ToString().Replace("Bearer ", "");
+        var isValid = _jwtService.ValidateAccessToken(authorization);
+
+        var userId = jwtToken?.Claims?.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Sub)?.Value;
+        if (!isValid || userId == null) throw new UnauthorizedException("Unauthorized");
+
+        var user = await _userRepository.FindOneById(Convert.ToInt32(userId));
 
         return _mapper.Map<UserDTO>(user);
     }

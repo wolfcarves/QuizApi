@@ -6,7 +6,6 @@ using Microsoft.IdentityModel.Tokens;
 using QuizApi.Application.Interfaces.Services;
 
 namespace QuizApi.Infrastructure.Authentication;
-
 public class JwtTokenService : IJwtTokenService
 {
     public string GenerateAccessToken(string userId, string username, string role)
@@ -43,7 +42,7 @@ public class JwtTokenService : IJwtTokenService
         return Convert.ToBase64String(randomText);
     }
 
-    public bool ValidateToken(string token)
+    public bool ValidateAccessToken(string token)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Environment.GetEnvironmentVariable("JWT_SECRET") ?? throw new InvalidOperationException("JWT_SECRET is not set");
@@ -68,6 +67,20 @@ public class JwtTokenService : IJwtTokenService
             return true;
         }
         catch
+        {
+            return false;
+        }
+    }
+
+    public bool ValidateRefreshToken(string token)
+    {
+        try
+        {
+            var decodedBytes = Convert.FromBase64String(token);
+
+            return decodedBytes.Length == 64;
+        }
+        catch (FormatException)
         {
             return false;
         }

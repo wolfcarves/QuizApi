@@ -1,48 +1,49 @@
 using Microsoft.AspNetCore.Mvc;
 using QuizApi.Application.DTO.User;
 using QuizApi.Application.Interfaces.Services;
+using QuizApi.WebApi.Application.DTO.Auth;
 using QuizApi.WebApi.Attributes;
+
+namespace QuizApi.WebApi.Controllers;
 
 [ApiController]
 [Route("api/v1/[controller]")]
-[SuccessRTA]
 [ServerInternalRTA]
-public class AuthController : ControllerBase
+public class AuthController : BaseController
 {
     private readonly IAuthService _authService;
-    private readonly IJwtTokenService _jwtService;
 
-    public AuthController(IAuthService authService, IJwtTokenService jwtService)
+    public AuthController(IAuthService authService)
     {
         _authService = authService;
-        _jwtService = jwtService;
     }
 
     [HttpPost("login", Name = "LoginUser")]
+    [SuccessRTA<LoginResponseDTO>]
     [UnauthorizedRTA]
     public async Task<IActionResult> Login([FromBody] UserLoginDTO requestBody)
     {
-        var user = await _authService.LoginUserAsync(requestBody);
+        var (accessToken, refreshToken) = await _authService.LoginUserAsync(requestBody);
 
-        var accessToken = _jwtService.GenerateAccessToken($"{user.Id}", user.Username, "user");
-        var refreshToken = _jwtService.GenerateRefreshToken();
-
-        return Ok(new
+        Response.Cookies.Append("refreshToken", refreshToken, new CookieOptions
         {
-            success = StatusCodes.Status200OK,
-            data = new
-            {
-                accessToken,
-                refreshToken
-            },
-            message = "Login successfully."
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.Lax,
+            Expires = DateTime.Now.AddDays(7)
         });
+
+        return Ok(
+                new LoginResponseDTO { AccessToken = accessToken, },
+                "Login success!"
+        );
     }
 
     [HttpPost("signup", Name = "SignupUser")]
+    [SuccessRTA<UserDTO>]
     [BadRequestRTA]
     [ConflictRTA]
-    public async Task<ActionResult<UserDTO>> Signup([FromBody] UserSignUpDTO requestBody)
+    public async Task<IActionResult> Signup([FromBody] UserSignUpDTO requestBody)
     {
         var user = await _authService.SignUpAsync(requestBody);
 
@@ -52,6 +53,18 @@ public class AuthController : ControllerBase
             data = user,
             message = "User succesfully created."
         });
+    }
+
+    [HttpGet]
+    [SuccessRTA<UserDTO>]
+    [UnauthorizedRTA]
+    public async Task<IActionResult> GetUserSession()
+    {
+        var accessToken = Request.Headers.Authorization;
+
+        var user = await _authService.GetUserSessionAsync(accessToken);
+
+        return Ok(user);
     }
 
     // [HttpGet]
