@@ -1,4 +1,6 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc.Filters;
+using QuizApi.Core.Entities;
 using QuizApi.Core.Exceptions;
 using QuizApi.Infrastructure.Authentication;
 
@@ -23,15 +25,19 @@ public class ValidateTokenAttribute : Attribute, IAsyncAuthorizationFilter
 
         var token = authHeader["Bearer ".Length..].Trim();
 
-        if (string.IsNullOrEmpty(token) || !IsValidToken(token))
+        if (string.IsNullOrEmpty(token) || IsValidToken(token) == null)
         {
             throw new BadRequestException("Invalid or expired token.");
         }
 
+        var userId = GetUserIdFromToken(token);
+
+        httpContext.Items["UserId"] = userId;
+
         await Task.CompletedTask;
     }
 
-    private bool IsValidToken(string token)
+    private ClaimsPrincipal? IsValidToken(string token)
     {
         try
         {
@@ -40,7 +46,23 @@ public class ValidateTokenAttribute : Attribute, IAsyncAuthorizationFilter
         }
         catch
         {
-            return false;
+            return null;
+        }
+    }
+
+    private string? GetUserIdFromToken(string token)
+    {
+        try
+        {
+            var jwt = new JwtTokenService();
+            var claimsPrincipal = jwt.ValidateAccessToken(token);
+
+            var userIdClaim = claimsPrincipal?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            return userIdClaim;
+        }
+        catch
+        {
+            return null;
         }
     }
 }

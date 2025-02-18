@@ -12,7 +12,7 @@ using QuizApi.Infrastructure.Persistence;
 namespace InitialMigration
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250218054948_InitialMigration")]
+    [Migration("20250218092017_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -37,7 +37,6 @@ namespace InitialMigration
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("Is_Published")

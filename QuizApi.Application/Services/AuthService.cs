@@ -67,10 +67,10 @@ public class AuthService : IAuthService
         var jwtToken = handler.ReadJwtToken(accessToken);
 
         var authorization = accessToken.ToString().Replace("Bearer ", "");
-        var isValid = _jwtService.ValidateAccessToken(authorization);
+        var claimsPrincipal = _jwtService.ValidateAccessToken(authorization);
 
         var userId = jwtToken?.Claims?.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Sub)?.Value;
-        if (!isValid || userId == null) throw new UnauthorizedException("Unauthorized");
+        if (claimsPrincipal == null || userId == null) throw new UnauthorizedException("Unauthorized");
 
         var user = await _userRepository.FindOneById(Convert.ToInt32(userId));
 

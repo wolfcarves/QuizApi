@@ -6,6 +6,6 @@ namespace QuizApi.Application.Interfaces.Services;
 
 public interface IQuizService
 {
-    Task<IEnumerable<Quiz>> GetQuizzesAsync();
-    Task<Quiz> CreateQuizAsync(QuizCreateDTO quizDto);
+    Task<IEnumerable<QuizDTO>> GetQuizzesAsync();
+    Task<QuizDTO> CreateQuizAsync(int userId, QuizCreateDTO quizDto);
 }

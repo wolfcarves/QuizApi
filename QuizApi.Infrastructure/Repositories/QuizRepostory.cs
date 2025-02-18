@@ -12,7 +12,7 @@ public class QuizRepository : IQuizRepository
 
     public async Task<IEnumerable<Quiz>> FindAll()
     {
-        var quizzes = await _context.Quizzes.ToListAsync();
+        var quizzes = await _context.Quizzes.Include(q => q.User).ToListAsync();
         return quizzes;
     }
 

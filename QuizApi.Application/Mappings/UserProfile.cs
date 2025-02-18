@@ -2,6 +2,8 @@ using AutoMapper;
 using QuizApi.Application.DTO.User;
 using QuizApi.Core.Entities;
 
+namespace QuizApi.Application.Mappings;
+
 public class UserProfile : Profile
 {
     public UserProfile()

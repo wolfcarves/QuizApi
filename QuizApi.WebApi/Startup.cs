@@ -8,6 +8,7 @@ using QuizApi.Application.Extensions;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using FluentValidation.AspNetCore;
+using QuizApi.Application.Mappings;
 
 public class Startup
 {
@@ -37,7 +38,7 @@ public class Startup
         services.AddJwtService();
         services.AddRepositoriesScope();
         services.AddCustomAppDbContext(Configuration);
-        services.AddAutoMapper(typeof(UserProfile));
+        services.AddAutoMapperProfiles();
 
         var tokenParameters = JwtConfiguration.GetTokenValidationParameters();
 
@@ -46,9 +47,7 @@ public class Startup
                     {
                         options.Authority = "http://localhost:5000";
                         options.Audience = "http://localhost:5000";
-
                         options.RequireHttpsMetadata = false;
-
                         options.TokenValidationParameters = tokenParameters;
                     });
     }

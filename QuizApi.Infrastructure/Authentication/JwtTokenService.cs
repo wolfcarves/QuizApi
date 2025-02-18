@@ -29,7 +29,7 @@ public class JwtTokenService : IJwtTokenService
             issuer: validIssuer,
             audience: validAudience,
             claims: claims,
-            expires: DateTime.UtcNow.AddSeconds(50),
+            expires: DateTime.UtcNow.AddHours(3),
             signingCredentials: creds
         );
 
@@ -42,7 +42,7 @@ public class JwtTokenService : IJwtTokenService
         return Convert.ToBase64String(randomText);
     }
 
-    public bool ValidateAccessToken(string token)
+    public ClaimsPrincipal? ValidateAccessToken(string token)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Environment.GetEnvironmentVariable("JWT_SECRET") ?? throw new InvalidOperationException("JWT_SECRET is not set");
@@ -63,12 +63,12 @@ public class JwtTokenService : IJwtTokenService
 
         try
         {
-            tokenHandler.ValidateToken(token, tokenValidationParameters, out _);
-            return true;
+            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out _);
+            return principal;
         }
         catch
         {
-            return false;
+            return null;
         }
     }
 
