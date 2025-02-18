@@ -49,7 +49,7 @@ public class GlobalExceptionHandler : IExceptionHandler
                 };
             }
 
-            var jsonResponse = JsonSerializer.Serialize(response, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase, DictionaryKeyPolicy = JsonNamingPolicy.CamelCase });
+            var jsonResponse = JsonSerializer.Serialize(response, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower, DictionaryKeyPolicy = JsonNamingPolicy.SnakeCaseLower });
             await httpContext.Response.WriteAsync(jsonResponse);
         }
 

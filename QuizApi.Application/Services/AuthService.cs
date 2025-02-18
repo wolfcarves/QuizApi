@@ -15,6 +15,7 @@ public class AuthService : IAuthService
     private readonly IUserRepository _userRepository;
     private readonly IJwtTokenService _jwtService;
     private readonly IMapper _mapper;
+
     public AuthService(IUserRepository userRepository, IJwtTokenService jwtService, IMapper mapper)
     {
         _userRepository = userRepository;

@@ -47,12 +47,7 @@ public class AuthController : BaseController
     {
         var user = await _authService.SignUpAsync(requestBody);
 
-        return CreatedAtRoute("GetUserById", new { userId = user.Id }, new
-        {
-            status = StatusCodes.Status201Created,
-            data = user,
-            message = "User succesfully created."
-        });
+        return CreatedAtRoute("GetUserById", new { userId = user.Id }, user);
     }
 
     [HttpGet]
@@ -64,17 +59,13 @@ public class AuthController : BaseController
 
         var user = await _authService.GetUserSessionAsync(accessToken);
 
-        return Ok(user);
+        return Ok(new UserDTO
+        {
+            Firstname = user.Firstname,
+            Lastname = user.Lastname,
+            Username = user.Username,
+        });
     }
 
-    // [HttpGet]
-    // public ActionResult<string> ValidateTokenKey(string token)
-    // {
-    //     var result = JsonSerializer.Serialize(_jwtService.ValidateToken(token), new JsonSerializerOptions
-    //     {
-    //         WriteIndented = true,
-    //         ReferenceHandler = ReferenceHandler.IgnoreCycles,
-    //     });
-    //     return Ok(new SuccessResponse<object>("awd"));
-    // }
+
 }

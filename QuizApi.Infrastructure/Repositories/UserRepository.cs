@@ -10,9 +10,10 @@ public class UserRepository : IUserRepository
     private readonly AppDbContext _context;
     public UserRepository(AppDbContext context) => _context = context;
 
-    public Task<User?> FindOneById(int userId)
+    public async Task<User?> FindOneById(int userId)
     {
-        throw new NotImplementedException();
+        var user = await _context.Users.FirstOrDefaultAsync(user => user.Id == userId);
+        return user;
     }
 
     public async Task<User?> FindOneByUsername(string username)

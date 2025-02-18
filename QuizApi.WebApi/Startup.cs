@@ -24,7 +24,7 @@ public class Startup
         services.AddControllers()
                 .AddJsonOptions(options =>
                 {
-                    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower;
                     options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.Never;
                 });
         services.AddFluentValidationAutoValidation();
@@ -42,7 +42,15 @@ public class Startup
         var tokenParameters = JwtConfiguration.GetTokenValidationParameters();
 
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                    .AddJwtBearer(options => options.TokenValidationParameters = tokenParameters);
+                    .AddJwtBearer(options =>
+                    {
+                        options.Authority = "http://localhost:5000";
+                        options.Audience = "http://localhost:5000";
+
+                        options.RequireHttpsMetadata = false;
+
+                        options.TokenValidationParameters = tokenParameters;
+                    });
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

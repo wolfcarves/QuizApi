@@ -9,6 +9,8 @@ public static class InfrastructureRepositoriesExtension
     public static IServiceCollection AddRepositoriesScope(this IServiceCollection services)
     {
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IQuizRepository, QuizRepository>();
+
         return services;
     }
 }
