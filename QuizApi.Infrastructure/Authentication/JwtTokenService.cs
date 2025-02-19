@@ -29,7 +29,7 @@ public class JwtTokenService : IJwtTokenService
             issuer: validIssuer,
             audience: validAudience,
             claims: claims,
-            expires: DateTime.UtcNow.AddHours(3),
+            expires: DateTime.UtcNow.AddHours(8),
             signingCredentials: creds
         );
 

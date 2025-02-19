@@ -9,6 +9,8 @@ public class AppDbContext : DbContext
 
     public DbSet<Quiz> Quizzes { get; set; }
     public DbSet<User> Users { get; set; }
+    public DbSet<Question> Questions { get; set; }
+    public DbSet<Choice> Choices { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -16,6 +18,12 @@ public class AppDbContext : DbContext
             .HasOne(q => q.User)
             .WithMany(q => q.Quizzes)
             .HasForeignKey(q => q.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<Question>()
+            .HasOne(q => q.Quiz)
+            .WithMany(q => q.Questions)
+            .HasForeignKey(q => q.QuizId)
             .OnDelete(DeleteBehavior.Cascade);
     }
 

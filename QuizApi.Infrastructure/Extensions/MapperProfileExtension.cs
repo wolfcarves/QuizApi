@@ -9,6 +9,7 @@ public static class MapperProfileExtension
     {
         services.AddAutoMapper(typeof(UserProfile));
         services.AddAutoMapper(typeof(QuizProfile));
+        services.AddAutoMapper(typeof(QuestionProfile));
 
         return services;
     }

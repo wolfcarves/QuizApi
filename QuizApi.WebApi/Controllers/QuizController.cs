@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using QuizApi.Application.Interfaces.Services;
-using QuizApi.Core.Entities;
 using QuizApi.WebApi.Application.DTO.Quiz;
 using QuizApi.WebApi.Attributes;
 
@@ -13,12 +12,12 @@ public class QuizController : ControllerBase
 {
     private readonly IQuizService _quizService;
 
-    public QuizController(IQuizService quizService) { _quizService = quizService; }
+    public QuizController(IQuizService quizService) => _quizService = quizService;
 
     [HttpGet]
-    [UnauthorizedRTA]
     [SuccessRTA<IEnumerable<QuizDTO>>]
-    [ValidateToken]
+    [UnauthorizedRTA]
+    [RequireAuth]
     public async Task<ActionResult<IEnumerable<QuizDTO>>> GetQuizzes()
     {
         var quizzes = await _quizService.GetQuizzesAsync();
@@ -27,7 +26,7 @@ public class QuizController : ControllerBase
 
     [HttpPost]
     [SuccessRTA<QuizDTO>]
-    [ValidateToken]
+    [RequireAuth]
     public async Task<ActionResult<QuizDTO>> CreateQuiz([FromBody] QuizCreateDTO body)
     {
         var userId = Convert.ToInt32(HttpContext.Items["UserId"]);

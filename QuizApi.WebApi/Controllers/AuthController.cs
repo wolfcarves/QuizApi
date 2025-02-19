@@ -9,7 +9,7 @@ namespace QuizApi.WebApi.Controllers;
 [ApiController]
 [Route("api/v1/[controller]")]
 [ServerInternalRTA]
-public class AuthController : BaseController
+public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
 
@@ -33,10 +33,7 @@ public class AuthController : BaseController
             Expires = DateTime.Now.AddDays(7)
         });
 
-        return Ok(
-                new LoginResponseDTO { AccessToken = accessToken, },
-                "Login success!"
-        );
+        return Ok(new { AccessToken = accessToken, });
     }
 
     [HttpPost("signup", Name = "SignupUser")]
@@ -53,19 +50,12 @@ public class AuthController : BaseController
     [HttpGet]
     [SuccessRTA<UserDTO>]
     [UnauthorizedRTA]
-    public async Task<IActionResult> GetUserSession()
+    public async Task<ActionResult<UserDTO>> GetUserSession()
     {
         var accessToken = Request.Headers.Authorization;
 
         var user = await _authService.GetUserSessionAsync(accessToken);
 
-        return Ok(new UserDTO
-        {
-            Firstname = user.Firstname,
-            Lastname = user.Lastname,
-            Username = user.Username,
-        });
+        return Ok(user);
     }
-
-
 }

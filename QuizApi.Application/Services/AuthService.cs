@@ -1,4 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using AutoMapper;
 using FluentValidation;
 using QuizApi.Application.DTO.User;
@@ -61,19 +62,24 @@ public class AuthService : IAuthService
 
     public async Task<UserDTO> GetUserSessionAsync(string? accessToken)
     {
-        if (accessToken == null) throw new UnauthorizedException("Unauthorized");
+        if (string.IsNullOrWhiteSpace(accessToken))
+            throw new UnauthorizedException("Unauthorized");
 
-        var handler = new JwtSecurityTokenHandler();
-        var jwtToken = handler.ReadJwtToken(accessToken);
+        var tokenString = accessToken.Replace("Bearer ", "").Trim();
 
-        var authorization = accessToken.ToString().Replace("Bearer ", "");
-        var claimsPrincipal = _jwtService.ValidateAccessToken(authorization);
+        var claimsPrincipal = _jwtService.ValidateAccessToken(tokenString);
+        if (claimsPrincipal == null)
+            throw new UnauthorizedException("Unauthorized");
 
-        var userId = jwtToken?.Claims?.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Sub)?.Value;
-        if (claimsPrincipal == null || userId == null) throw new UnauthorizedException("Unauthorized");
+        var userId = claimsPrincipal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (userId == null)
+            throw new UnauthorizedException("Unauthorized");
 
         var user = await _userRepository.FindOneById(Convert.ToInt32(userId));
+        if (user == null)
+            throw new UnauthorizedException("Unauthorized");
 
         return _mapper.Map<UserDTO>(user);
     }
+
 }

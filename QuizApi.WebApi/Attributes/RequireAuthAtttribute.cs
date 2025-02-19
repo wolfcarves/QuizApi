@@ -6,7 +6,7 @@ using QuizApi.Infrastructure.Authentication;
 
 namespace QuizApi.WebApi.Attributes;
 
-public class ValidateTokenAttribute : Attribute, IAsyncAuthorizationFilter
+public class RequireAuthAttribute : Attribute, IAsyncAuthorizationFilter
 {
     public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
     {
@@ -15,7 +15,7 @@ public class ValidateTokenAttribute : Attribute, IAsyncAuthorizationFilter
 
         if (string.IsNullOrWhiteSpace(authHeader))
         {
-            throw new BadRequestException("Missing Authorization header.");
+            throw new BadRequestException("Missing Authorization Header.");
         }
 
         if (!authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
@@ -27,7 +27,7 @@ public class ValidateTokenAttribute : Attribute, IAsyncAuthorizationFilter
 
         if (string.IsNullOrEmpty(token) || IsValidToken(token) == null)
         {
-            throw new BadRequestException("Invalid or expired token.");
+            throw new BadRequestException("Unauthorized");
         }
 
         var userId = GetUserIdFromToken(token);

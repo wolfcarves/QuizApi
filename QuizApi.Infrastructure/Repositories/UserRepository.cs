@@ -12,7 +12,7 @@ public class UserRepository : IUserRepository
 
     public async Task<User?> FindOneById(int userId)
     {
-        var user = await _context.Users.FirstOrDefaultAsync(user => user.Id == userId);
+        var user = await _context.Users.FindAsync(userId);
         return user;
     }
 

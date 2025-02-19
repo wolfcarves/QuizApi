@@ -1,5 +1,3 @@
-
-
 namespace QuizApi.Core.Entities;
 
 public class Quiz : BaseEntity
@@ -11,4 +9,5 @@ public class Quiz : BaseEntity
     public bool Is_Published { get; set; } = false;
 
     public User User { get; set; } = null!;
+    public ICollection<Question> Questions { get; set; } = null!;
 }
