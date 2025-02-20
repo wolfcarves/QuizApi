@@ -11,6 +11,7 @@ public static class InfrastructureRepositoriesExtension
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IQuizRepository, QuizRepository>();
         services.AddScoped<IQuestionRepository, QuestionRepository>();
+        services.AddScoped<IChoiceRepository, ChoiceRepository>();
 
         return services;
     }

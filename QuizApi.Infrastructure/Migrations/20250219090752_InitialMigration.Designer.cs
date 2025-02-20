@@ -12,7 +12,7 @@ using QuizApi.Infrastructure.Persistence;
 namespace InitialMigration
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250219023848_InitialMigration")]
+    [Migration("20250219090752_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -53,7 +53,7 @@ namespace InitialMigration
 
                     b.HasIndex("QuestionId");
 
-                    b.ToTable("Choice");
+                    b.ToTable("Choices");
                 });
 
             modelBuilder.Entity("QuizApi.Core.Entities.Question", b =>
@@ -63,6 +63,9 @@ namespace InitialMigration
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AnswerId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");

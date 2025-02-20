@@ -15,6 +15,15 @@ public class QuestionController : ControllerBase
 
     public QuestionController(IQuestionService questionService) => _questionService = questionService;
 
+    // [HttpPost("{quizId}")]
+    // [SuccessRTA<IEnumerable<QuestionCreateDTO>>]
+    // [BadRequestRTA]
+    // public async Task<IActionResult> CreateQuestion(int quizId, [FromBody] IEnumerable<QuestionCreateDTO> requestBody)
+    // {
+    //     var createdQuestions = await _questionService.CreateQuestionAsync(quizId, requestBody);
+    //     return Ok(createdQuestions);
+    // }
+
     [HttpPost("{quizId}")]
     [SuccessRTA<IEnumerable<QuestionCreateDTO>>]
     [BadRequestRTA]

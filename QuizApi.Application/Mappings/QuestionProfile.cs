@@ -8,7 +8,8 @@ public class QuestionProfile : Profile
 {
     public QuestionProfile()
     {
-        CreateMap<QuestionCreateDTO, Question>();
+        CreateMap<QuestionCreateDTO, Question>()
+            .ForMember(dest => dest.Choices, opt => opt.MapFrom(src => src.Choices));
         CreateMap<Question, QuestionDTO>();
     }
 }

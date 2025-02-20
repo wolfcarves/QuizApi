@@ -24,7 +24,7 @@ public class AuthService : IAuthService
         _mapper = mapper;
     }
 
-    public async Task<(string accessToken, string refreshToken)> LoginUserAsync(UserLoginDTO requestBody)
+    public async Task<(User user, string accessToken, string refreshToken)> LoginUserAsync(UserLoginDTO requestBody)
     {
         string username = requestBody.Username;
 
@@ -36,7 +36,7 @@ public class AuthService : IAuthService
         var accessToken = _jwtService.GenerateAccessToken($"{user.Id}", user.Username, "user");
         var refreshToken = _jwtService.GenerateRefreshToken();
 
-        return (accessToken, refreshToken);
+        return (user, accessToken, refreshToken);
     }
 
     public async Task<UserDTO> SignUpAsync(UserSignUpDTO requestBody)

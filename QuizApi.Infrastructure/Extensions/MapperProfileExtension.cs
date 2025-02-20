@@ -10,6 +10,7 @@ public static class MapperProfileExtension
         services.AddAutoMapper(typeof(UserProfile));
         services.AddAutoMapper(typeof(QuizProfile));
         services.AddAutoMapper(typeof(QuestionProfile));
+        services.AddAutoMapper(typeof(ChoiceProfile));
 
         return services;
     }

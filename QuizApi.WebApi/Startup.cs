@@ -8,7 +8,6 @@ using QuizApi.Application.Extensions;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using FluentValidation.AspNetCore;
-using QuizApi.Application.Mappings;
 
 public class Startup
 {
@@ -50,6 +49,19 @@ public class Startup
                         options.RequireHttpsMetadata = false;
                         options.TokenValidationParameters = tokenParameters;
                     });
+
+        services.AddCors(options =>
+        {
+            options.AddPolicy(name: "AllowAll",
+                policy =>
+                {
+                    policy.WithOrigins("http://localhost:5173")
+                        .AllowAnyMethod()
+                        .AllowCredentials()
+                        .AllowAnyHeader();
+                });
+        });
+
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -68,6 +80,7 @@ public class Startup
 
         app.UseAuthentication();
         app.UseAuthorization();
+        app.UseCors();
 
         app.UseEndpoints(
             endpoints => endpoints.MapControllers()

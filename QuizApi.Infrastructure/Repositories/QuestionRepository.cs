@@ -18,8 +18,33 @@ public class QuestionRepository : IQuestionRepository
         {
             await _context.Questions.AddRangeAsync(questions);
             await _context.SaveChangesAsync();
-            await transaction.CommitAsync();
 
+            var allChoices = new List<Choice>();
+
+            foreach (var question in questions)
+            {
+                foreach (var choice in question.Choices)
+                {
+                    choice.QuestionId = question.Id;
+                    choice.Id = 0;
+                }
+                allChoices.AddRange(question.Choices);
+            }
+
+            await _context.Choices.AddRangeAsync(allChoices);
+            await _context.SaveChangesAsync();
+
+            foreach (var question in questions)
+            {
+                var correctChoice = question.Choices.FirstOrDefault(c => c.Is_Correct);
+                if (correctChoice != null)
+                    question.AnswerId = correctChoice.Id;
+            }
+
+            _context.Questions.UpdateRange(questions);
+            await _context.SaveChangesAsync();
+
+            await transaction.CommitAsync();
             return questions;
         }
         catch
@@ -28,6 +53,26 @@ public class QuestionRepository : IQuestionRepository
             throw;
         }
     }
+
+
+    // public async Task<IEnumerable<Question>> Create(IEnumerable<Question> questions)
+    // {
+    //     using var transaction = await _context.Database.BeginTransactionAsync();
+
+    //     try
+    //     {
+    //         await _context.Questions.AddRangeAsync(questions);
+    //         await _context.SaveChangesAsync();
+    //         await transaction.CommitAsync();
+
+    //         return questions;
+    //     }
+    //     catch
+    //     {
+    //         await transaction.RollbackAsync();
+    //         throw;
+    //     }
+    // }
 
     public async Task<IEnumerable<Question>> FindAll(int quizId)
     {

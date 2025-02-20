@@ -61,6 +61,7 @@ namespace InitialMigration
                         .Annotation("SqlServer:Identity", "1, 1"),
                     QuizId = table.Column<int>(type: "int", nullable: false),
                     Text = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AnswerId = table.Column<int>(type: "int", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
@@ -76,7 +77,7 @@ namespace InitialMigration
                 });
 
             migrationBuilder.CreateTable(
-                name: "Choice",
+                name: "Choices",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -89,9 +90,9 @@ namespace InitialMigration
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Choice", x => x.Id);
+                    table.PrimaryKey("PK_Choices", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Choice_Questions_QuestionId",
+                        name: "FK_Choices_Questions_QuestionId",
                         column: x => x.QuestionId,
                         principalTable: "Questions",
                         principalColumn: "Id",
@@ -99,8 +100,8 @@ namespace InitialMigration
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Choice_QuestionId",
-                table: "Choice",
+                name: "IX_Choices_QuestionId",
+                table: "Choices",
                 column: "QuestionId");
 
             migrationBuilder.CreateIndex(
@@ -118,7 +119,7 @@ namespace InitialMigration
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Choice");
+                name: "Choices");
 
             migrationBuilder.DropTable(
                 name: "Questions");

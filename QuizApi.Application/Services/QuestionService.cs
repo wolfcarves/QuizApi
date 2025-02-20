@@ -1,4 +1,5 @@
 using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using QuizApi.Application.Interfaces.Repositories;
 using QuizApi.Application.Interfaces.Services;
 using QuizApi.Core.Entities;
@@ -10,11 +11,13 @@ namespace QuizApi.Application.Services;
 public class QuestionService : IQuestionService
 {
     private readonly IQuestionRepository _questionRepository;
+    private readonly IChoiceRepository _choiceRepository;
     private readonly IMapper _mapper;
 
-    public QuestionService(IQuestionRepository questionRepository, IMapper mapper)
+    public QuestionService(IQuestionRepository questionRepository, IChoiceRepository choiceRepository, IMapper mapper)
     {
         _questionRepository = questionRepository;
+        _choiceRepository = choiceRepository;
         _mapper = mapper;
     }
 
@@ -26,12 +29,21 @@ public class QuestionService : IQuestionService
         var questions = _mapper.Map<List<Question>>(requestBody);
 
         foreach (var question in questions)
+        {
             question.QuizId = quizId;
 
-        var createdQuestion = await _questionRepository.Create(questions);
+            if (question.Choices == null || !question.Choices.Any())
+                throw new BadRequestException("Each question must have at least one choice.");
 
-        return _mapper.Map<IEnumerable<QuestionDTO>>(createdQuestion);
+            if (!question.Choices.Any(c => c.Is_Correct))
+                throw new BadRequestException("Each question must have at least one correct answer.");
+        }
+
+        var createdQuestions = await _questionRepository.Create(questions);
+
+        return _mapper.Map<IEnumerable<QuestionDTO>>(createdQuestions);
     }
+
 
     public async Task<IEnumerable<QuestionDTO>> GetAllQuestionsByQuizIdAsync(int quizId)
     {

@@ -50,7 +50,7 @@ namespace InitialMigration
 
                     b.HasIndex("QuestionId");
 
-                    b.ToTable("Choice");
+                    b.ToTable("Choices");
                 });
 
             modelBuilder.Entity("QuizApi.Core.Entities.Question", b =>
@@ -60,6 +60,9 @@ namespace InitialMigration
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AnswerId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
