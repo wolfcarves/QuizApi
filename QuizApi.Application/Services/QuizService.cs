@@ -30,8 +30,8 @@ public class QuizService : IQuizService
 
     public async Task<QuizDTO> CreateQuizAsync(int userId, QuizCreateDTO quizDto)
     {
-        QuizCreateValidator validator = new QuizCreateValidator();
-        await validator.ValidateAndThrowAsync(quizDto);
+        // QuizCreateValidator validator = new QuizCreateValidator();
+        // await validator.ValidateAndThrowAsync(quizDto);
 
         var user = await _userRepository.FindOneById(userId);
         if (user == null) throw new UnauthorizedException("Unauthorized");

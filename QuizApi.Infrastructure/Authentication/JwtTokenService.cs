@@ -8,13 +8,13 @@ using QuizApi.Application.Interfaces.Services;
 namespace QuizApi.Infrastructure.Authentication;
 public class JwtTokenService : IJwtTokenService
 {
-    public string GenerateAccessToken(string userId, string username, string role)
+    public string GenerateAccessToken(string userId, string username)
     {
         var claims = new[]
         {
             new Claim(JwtRegisteredClaimNames.Sub, userId),
             new Claim(JwtRegisteredClaimNames.PreferredUsername, username),
-            new Claim(ClaimTypes.Role, role),
+            new Claim(ClaimTypes.Role, "user"),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 

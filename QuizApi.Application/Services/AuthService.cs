@@ -1,4 +1,3 @@
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using AutoMapper;
 using FluentValidation;
@@ -33,13 +32,13 @@ public class AuthService : IAuthService
         if (user == null)
             throw new UnauthorizedException("Username or password is incorrect");
 
-        var accessToken = _jwtService.GenerateAccessToken($"{user.Id}", user.Username, "user");
+        var accessToken = _jwtService.GenerateAccessToken($"{user.Id}", user.Username);
         var refreshToken = _jwtService.GenerateRefreshToken();
 
         return (user, accessToken, refreshToken);
     }
 
-    public async Task<UserDTO> SignUpAsync(UserSignUpDTO requestBody)
+    public async Task<UserDTO> SignupUserAsync(UserSignUpDTO requestBody)
     {
         UserSignupValidator validator = new UserSignupValidator();
         await validator.ValidateAndThrowAsync(requestBody);
@@ -82,4 +81,23 @@ public class AuthService : IAuthService
         return _mapper.Map<UserDTO>(user);
     }
 
+    public async Task<UserDTO> DeleteUserSessionAsync(int userId)
+    {
+        var user = await _userRepository.FindOneById(userId);
+        var userDto = _mapper.Map<UserDTO>(user);
+
+        return userDto;
+    }
+
+    public async Task<string> GetNewAccessTokenAsync(int userId, string? refreshToken)
+    {
+        var user = await _userRepository.FindOneById(userId);
+        if (user == null) throw new NotFoundException("User not found");
+
+        if (refreshToken == null) throw new UnauthorizedException("No refresh token");
+
+        string accessToken = _jwtService.GenerateAccessToken(user.Id.ToString(), user.Username);
+
+        return accessToken;
+    }
 }

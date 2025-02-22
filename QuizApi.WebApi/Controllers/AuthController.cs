@@ -1,3 +1,4 @@
+using System.Security;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using QuizApi.Application.DTO.User;
@@ -30,9 +31,9 @@ public class AuthController : ControllerBase
         Response.Cookies.Append("refreshToken", refreshToken, new CookieOptions
         {
             HttpOnly = true,
-            Secure = false,
+            Secure = true,
             SameSite = SameSiteMode.Lax,
-            Expires = DateTime.Now.AddDays(7)
+            Expires = DateTime.Now.AddMinutes(1)
         });
 
         return Ok(new
@@ -53,7 +54,7 @@ public class AuthController : ControllerBase
     [ConflictRTA]
     public async Task<IActionResult> SignupUser([FromBody] UserSignUpDTO requestBody)
     {
-        var user = await _authService.SignUpAsync(requestBody);
+        var user = await _authService.SignupUserAsync(requestBody);
 
         return CreatedAtRoute("GetUserById", new { userId = user.Id }, user);
     }
@@ -68,5 +69,33 @@ public class AuthController : ControllerBase
         var user = await _authService.GetUserSessionAsync(accessToken);
 
         return Ok(user);
+    }
+
+    [HttpDelete("logout")]
+    [SuccessRTA<UserDTO>]
+    [UnauthorizedRTA]
+    public async Task<ActionResult<UserDTO>> LogoutUser()
+    {
+        int userId = Convert.ToInt32(HttpContext.Items["UserId"]);
+
+        Response.Cookies.Delete("refreshToken");
+        var user = await _authService.DeleteUserSessionAsync(userId);
+
+        return Ok(user);
+    }
+
+    [HttpGet("renew/accessToken")]
+    public async Task<IActionResult> RenewAccessToken()
+    {
+        int userId = Convert.ToInt32(HttpContext.Items["UserId"]);
+
+        var refreshToken = Request.Cookies["refreshToken"];
+
+        var accessToken = await _authService.GetNewAccessTokenAsync(userId, refreshToken);
+
+        return Ok(new
+        {
+            AccessToken = accessToken,
+        });
     }
 }

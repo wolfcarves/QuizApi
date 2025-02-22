@@ -12,7 +12,7 @@ using QuizApi.Infrastructure.Persistence;
 namespace InitialMigration
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250219090752_InitialMigration")]
+    [Migration("20250222041724_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
