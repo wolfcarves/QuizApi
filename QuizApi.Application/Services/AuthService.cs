@@ -89,14 +89,17 @@ public class AuthService : IAuthService
         return userDto;
     }
 
-    public async Task<string> GetNewAccessTokenAsync(int userId, string? refreshToken)
+    public async Task<string> GetNewAccessTokenAsync(string? userId, string? username, string? refreshToken)
     {
-        var user = await _userRepository.FindOneById(userId);
-        if (user == null) throw new NotFoundException("User not found");
+        if (userId == null || username == null) throw new UnauthorizedException("Unauthorized");
 
         if (refreshToken == null) throw new UnauthorizedException("No refresh token");
 
-        string accessToken = _jwtService.GenerateAccessToken(user.Id.ToString(), user.Username);
+        bool isRefreshTokenValid = _jwtService.ValidateRefreshToken(refreshToken);
+
+        if (!isRefreshTokenValid) throw new UnauthorizedException("Token expired");
+
+        string accessToken = _jwtService.GenerateAccessToken(userId, username);
 
         return accessToken;
     }

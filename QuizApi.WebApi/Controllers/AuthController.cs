@@ -1,4 +1,4 @@
-using System.Security;
+using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using QuizApi.Application.DTO.User;
@@ -33,7 +33,7 @@ public class AuthController : ControllerBase
             HttpOnly = true,
             Secure = true,
             SameSite = SameSiteMode.Lax,
-            Expires = DateTime.Now.AddMinutes(1)
+            Expires = DateTime.Now.AddSeconds(30)
         });
 
         return Ok(new
@@ -84,18 +84,21 @@ public class AuthController : ControllerBase
         return Ok(user);
     }
 
-    [HttpGet("renew/accessToken")]
+    [HttpPost("renew/accessToken")]
+    [SuccessRTA<RenewAccessTokenResponseDTO>]
     public async Task<IActionResult> RenewAccessToken()
     {
-        int userId = Convert.ToInt32(HttpContext.Items["UserId"]);
+        var accessToken = Request.Headers.Authorization;
 
+        var handler = new JwtSecurityTokenHandler();
+        var token = handler.ReadJwtToken(accessToken);
+
+        var userId = token.Payload["sub"].ToString();
+        var username = token.Payload["preferred_username"].ToString();
         var refreshToken = Request.Cookies["refreshToken"];
 
-        var accessToken = await _authService.GetNewAccessTokenAsync(userId, refreshToken);
+        var newAccessToken = await _authService.GetNewAccessTokenAsync(userId, username, refreshToken);
 
-        return Ok(new
-        {
-            AccessToken = accessToken,
-        });
+        return Ok(new { AccessToken = newAccessToken });
     }
 }

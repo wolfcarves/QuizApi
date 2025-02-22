@@ -9,5 +9,5 @@ public interface IAuthService
     Task<UserDTO> SignupUserAsync(UserSignUpDTO requestBody);
     Task<UserDTO> GetUserSessionAsync(string? accessToken);
     Task<UserDTO> DeleteUserSessionAsync(int userId);
-    Task<string> GetNewAccessTokenAsync(int userId, string? refreshToken);
+    Task<string> GetNewAccessTokenAsync(string? userId, string? username, string? refreshToken);
 }
