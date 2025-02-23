@@ -1,5 +1,4 @@
 using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
 using QuizApi.Application.Interfaces.Repositories;
 using QuizApi.Application.Interfaces.Services;
 using QuizApi.Core.Entities;

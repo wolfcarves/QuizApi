@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using QuizApi.Application.Interfaces.Services;
 using QuizApi.WebApi.Application.DTO.Quiz;
@@ -7,6 +8,7 @@ namespace QuizApi.WebApi.Controllers;
 
 [ApiController]
 [Route("api/v1/[controller]")]
+[EnableCors("AllowAll")]
 [ServerInternalRTA]
 public class QuizController : ControllerBase
 {
@@ -14,17 +16,18 @@ public class QuizController : ControllerBase
 
     public QuizController(IQuizService quizService) => _quizService = quizService;
 
-    [HttpGet]
+    [HttpGet(Name = "GetApiV1GetQuizzes")]
     [SuccessRTA<IEnumerable<QuizDTO>>]
     [UnauthorizedRTA]
     [RequireAuth]
     public async Task<ActionResult<IEnumerable<QuizDTO>>> GetQuizzes()
     {
         var quizzes = await _quizService.GetQuizzesAsync();
+
         return Ok(quizzes);
     }
 
-    [HttpPost]
+    [HttpPost(Name = "PostApiV1CreateQuiz")]
     [SuccessRTA<QuizDTO>]
     [RequireAuth]
     public async Task<ActionResult<QuizDTO>> CreateQuiz([FromBody] QuizCreateDTO body)

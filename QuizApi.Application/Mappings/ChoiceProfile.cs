@@ -9,5 +9,8 @@ public class ChoiceProfile : Profile
     public ChoiceProfile()
     {
         CreateMap<ChoiceCreateDTO, Choice>();
+        CreateMap<ChoiceDTO, Choice>();
+        CreateMap<Choice, ChoiceDTO>();
+
     }
 }
