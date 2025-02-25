@@ -12,7 +12,10 @@ public class QuizRepository : IQuizRepository
 
     public async Task<IEnumerable<Quiz>> FindAll()
     {
-        var quizzes = await _context.Quizzes.Include(q => q.User).ToListAsync();
+        var quizzes = await _context.Quizzes
+                        .Include(q => q.User)
+                        .OrderByDescending(c => c.CreatedAt)
+                        .ToListAsync();
         return quizzes;
     }
 
@@ -20,6 +23,12 @@ public class QuizRepository : IQuizRepository
     {
         _context.Quizzes.Add(quiz);
         await _context.SaveChangesAsync();
+        return quiz;
+    }
+
+    public async Task<Quiz?> FindOneById(int quizId)
+    {
+        var quiz = await _context.Quizzes.FirstOrDefaultAsync(q => q.Id == quizId);
         return quiz;
     }
 }

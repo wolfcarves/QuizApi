@@ -16,29 +16,27 @@ public class QuestionRepository : IQuestionRepository
 
         try
         {
-            await _context.Questions.AddRangeAsync(questions);
-            await _context.SaveChangesAsync();
-
-            var allChoices = new List<Choice>();
-
+            // Ensure Choices are not tracked separately to avoid duplication
             foreach (var question in questions)
             {
                 foreach (var choice in question.Choices)
                 {
-                    choice.QuestionId = question.Id;
-                    choice.Id = 0;
+                    choice.Id = 0;  // Reset ID for new entries
                 }
-                allChoices.AddRange(question.Choices);
             }
 
-            await _context.Choices.AddRangeAsync(allChoices);
-            await _context.SaveChangesAsync();
+            // Add questions (Choices will be added automatically)
+            await _context.Questions.AddRangeAsync(questions);
+            await _context.SaveChangesAsync(); // Ensure questions get IDs
 
+            // Update AnswerId after IDs are generated
             foreach (var question in questions)
             {
                 var correctChoice = question.Choices.FirstOrDefault(c => c.Is_Correct);
                 if (correctChoice != null)
+                {
                     question.AnswerId = correctChoice.Id;
+                }
             }
 
             _context.Questions.UpdateRange(questions);
@@ -53,6 +51,7 @@ public class QuestionRepository : IQuestionRepository
             throw;
         }
     }
+
 
     public async Task<IEnumerable<Question>> FindAll(int quizId)
     {

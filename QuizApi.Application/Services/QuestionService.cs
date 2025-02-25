@@ -9,12 +9,14 @@ namespace QuizApi.Application.Services;
 
 public class QuestionService : IQuestionService
 {
+    private readonly IQuizRepository _quizRepository;
     private readonly IQuestionRepository _questionRepository;
     private readonly IChoiceRepository _choiceRepository;
     private readonly IMapper _mapper;
 
-    public QuestionService(IQuestionRepository questionRepository, IChoiceRepository choiceRepository, IMapper mapper)
+    public QuestionService(IQuizRepository quizRepository, IQuestionRepository questionRepository, IChoiceRepository choiceRepository, IMapper mapper)
     {
+        _quizRepository = quizRepository;
         _questionRepository = questionRepository;
         _choiceRepository = choiceRepository;
         _mapper = mapper;
@@ -22,6 +24,8 @@ public class QuestionService : IQuestionService
 
     public async Task<IEnumerable<QuestionDTO>> CreateQuestionAsync(int quizId, IEnumerable<QuestionCreateDTO> requestBody)
     {
+        var existingQuiz = await _quizRepository.FindOneById(quizId) ?? throw new NotFoundException("Quiz not found");
+
         if (requestBody == null || !requestBody.Any())
             throw new BadRequestException("Request body cannot be null");
 
@@ -36,12 +40,20 @@ public class QuestionService : IQuestionService
 
             if (!question.Choices.Any(c => c.Is_Correct))
                 throw new BadRequestException("Each question must have at least one correct answer.");
+
+            question.Choices = question.Choices.Select(choice => new Choice
+            {
+                Text = choice.Text,
+                Is_Correct = choice.Is_Correct,
+                QuestionId = question.Id
+            }).ToList();
         }
 
         var createdQuestions = await _questionRepository.Create(questions);
 
         return _mapper.Map<IEnumerable<QuestionDTO>>(createdQuestions);
     }
+
 
 
     public async Task<IEnumerable<QuestionDTO>> GetAllQuestionsByQuizIdAsync(int quizId)
