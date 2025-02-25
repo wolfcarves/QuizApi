@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using AutoMapper;
+using BCrypt.Net;
 using FluentValidation;
 using QuizApi.Application.DTO.User;
 using QuizApi.Application.Interfaces.Repositories;
@@ -26,11 +27,16 @@ public class AuthService : IAuthService
     public async Task<(User user, string accessToken, string refreshToken)> LoginUserAsync(UserLoginDTO requestBody)
     {
         string username = requestBody.Username;
+        string password = requestBody.Password;
 
         var user = await _userRepository.FindOneByUsername(username);
 
         if (user == null)
             throw new UnauthorizedException("Username or password is incorrect");
+
+        bool isPasswordMatched = BCrypt.Net.BCrypt.Verify(password, user.Password);
+
+        if (!isPasswordMatched) throw new UnauthorizedException("Username or password is incorrect");
 
         var accessToken = _jwtService.GenerateAccessToken($"{user.Id}", user.Username);
         var refreshToken = _jwtService.GenerateRefreshToken();

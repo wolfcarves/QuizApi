@@ -16,20 +16,17 @@ public class QuestionRepository : IQuestionRepository
 
         try
         {
-            // Ensure Choices are not tracked separately to avoid duplication
             foreach (var question in questions)
             {
                 foreach (var choice in question.Choices)
                 {
-                    choice.Id = 0;  // Reset ID for new entries
+                    choice.Id = 0;
                 }
             }
 
-            // Add questions (Choices will be added automatically)
             await _context.Questions.AddRangeAsync(questions);
             await _context.SaveChangesAsync(); // Ensure questions get IDs
 
-            // Update AnswerId after IDs are generated
             foreach (var question in questions)
             {
                 var correctChoice = question.Choices.FirstOrDefault(c => c.Is_Correct);
